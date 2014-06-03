@@ -2,11 +2,18 @@
 
 Game::Game()
 {
-    resetGame();
+    m_board = new GameBoard();
+    m_gameState = GS_STOPPED;
+
+    //resetGame();
+
+
 }
 
 void Game::Update(float dt)
 {
+    m_board->Update(dt);
+
     switch (m_gameState)
     {
     case GS_STOPPED:
@@ -61,5 +68,7 @@ void Game::updateStoppingState(float dt)
 
 void Game::resetGame()
 {
+    m_board->ResetBoard();
+
     m_gameState = GS_STOPPED;
 }

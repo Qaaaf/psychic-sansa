@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "GameBoard.h"
+
 enum GameType
 {
     GAME_WHACKAMOLE,
@@ -15,9 +17,6 @@ public:
         static Game g;
         return g;
     }
-
-
-
 
     void Update(float dt);
 

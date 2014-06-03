@@ -4,7 +4,7 @@
 #include <QGraphicsView>
 #include <QTimer>
 
-#include "gameboard.h"
+#include "game.h"
 #include "tile.h"
 
 #include <QHBoxLayout>
@@ -13,7 +13,7 @@
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    GameBoard::I().window = this;
+    Game::I().m_board->window = this;
 
     //QWidget* w = new QWidget;
     //w->resize(1000,1000);

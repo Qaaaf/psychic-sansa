@@ -12,8 +12,8 @@ class GameWindow;
 
 class GameBoard
 {
-    GameBoard();
 public:
+    GameBoard();
     ~GameBoard();
 
     //static GameBoard& I()

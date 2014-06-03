@@ -32,7 +32,9 @@ void MapPixmaps()
     p4 = new QPixmap;
     pDefault = new QPixmap;
 
-    p0->load("../Resources/Icon_0.png");
+    if(!p0->load("../Resources/Icon_0.png"))
+        return;
+
     p1->load("../Resources/Icon_1.png");
     p2->load("../Resources/Icon_2.png");
     p3->load("../Resources/Icon_3.png");
@@ -208,7 +210,7 @@ void Tile::toFlippingState()
        m_turnover = true;
 
        QMediaPlayer* player = new QMediaPlayer();
-       player->setMedia(QUrl::fromLocalFile("C:/WAM/Resources/mallard_duck-Mike_Koenig-667013646.wav"));
+       player->setMedia(QUrl::fromLocalFile("../Resources/mallard_duck-Mike_Koenig-667013646.wav"));
        player->setVolume(50);
        player->play();
     }

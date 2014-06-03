@@ -2,7 +2,7 @@
 
 #include <QtWidgets>
 
-#include "gameboard.h"
+#include "game.h"
 
 //const int IdRole = Qt::UserRole;
 
@@ -53,21 +53,9 @@ void SettingsWindow::boardChanged()
     int height = boardHeightSpinBox->value();
 
     //tell gameboard
-    GameBoard::I().SetBoardXY(width, height);
-
-
+    Game::I().m_board->SetBoardXY(width, height);
 }
 
 SettingsWindow::~SettingsWindow()
 {
 }
-
-//QSize SettingsWindow::minimumSizeHint() const
-//{
-//    return QSize(100, 100);
-//}
-
-//QSize SettingsWindow::sizeHint() const
-//{
-//    return QSize(400, 400);
-//}

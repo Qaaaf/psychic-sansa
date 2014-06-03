@@ -8,29 +8,8 @@
 
 #include "gamewindow.h"
 
-//QPixmap* p1;
-//QPixmap* p2;
-//QPixmap* p3;
-//QPixmap* p4;
-//QPixmap* p0;
-//QPixmap* pDefault;
-
 GameBoard::GameBoard()
 {
-//    p0 = new QPixmap;
-//    p1 = new QPixmap;
-//    p2 = new QPixmap;
-//    p3 = new QPixmap;
-//    p4 = new QPixmap;
-//    pDefault = new QPixmap;
-
-//    p0->load("../Resources/Icon_0.png");
-//    p1->load("../Resources/Icon_1.png");
-//    p2->load("../Resources/Icon_2.png");
-//    p3->load("../Resources/Icon_3.png");
-//    p4->load("../Resources/Icon_4.png");
-//    pDefault->load("../Resources/Icon_Back.png");
-
     pixmap = new QPixmap;
     pixmap->load("../Resources/Icon_Back.png");
 
@@ -43,31 +22,6 @@ GameBoard::GameBoard()
 
     scene = new QGraphicsScene(0);
 }
-
-//QPixmap& getmap()
-//{
-//    int i = rand()%5;
-//    switch (i)
-//    {
-//    case 0:
-//        return *p0;
-//        break;
-//    case 1:
-//        return *p1;
-//        break;
-//    case 2:
-//        return *p2;
-//        break;
-//    case 3:
-//        return *p3;
-//        break;
-//    case 4:
-//        return *p4;
-//        break;
-//    default:
-//        return *pDefault;
-//    }
-//}
 
 GameBoard::~GameBoard()
 {
@@ -91,6 +45,9 @@ void GameBoard::SetBoardXY(int x, int y)
 
 void GameBoard::CreateBoard()
 {
+    if(m_width < 1 || m_height < 1)
+        return;
+
     if(m_tiles)
     {
         scene->clear();

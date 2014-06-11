@@ -15,10 +15,13 @@ GameWindow::GameWindow(QWidget *parent) :
 {
     Game::I().m_board->window = this;
 
+	this->setFixedSize(1024,600); //todo fix later
+
     //QWidget* w = new QWidget;
     //w->resize(1000,1000);
 
     graphicsView = new QGraphicsView(this);
+	//graphicsView->setFixedSize(1024, 600);
     graphicsView->setRenderHint(QPainter::Antialiasing, false);
     graphicsView->setDragMode(QGraphicsView::RubberBandDrag);
     graphicsView->setOptimizationFlags(QGraphicsView::DontSavePainterState);

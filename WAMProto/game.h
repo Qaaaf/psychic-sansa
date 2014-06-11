@@ -1,7 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <QObject>
+
 #include "GameBoard.h"
+#include <QList>
+
 
 enum GameType
 {
@@ -9,14 +13,16 @@ enum GameType
     GAME_TESTAMOLE,
 };
 
-class Game
+class Animal;
+class QTimer;
+class Game : public QObject
 {
+    Q_OBJECT
+
 public:
-    static Game& I()
-    {
-        static Game g;
-        return g;
-    }
+    Game();
+
+    static Game& I();
 
     void Update(float dt);
 
@@ -36,6 +42,7 @@ public:
 
     void resetGame();
 
+
     enum GameState
     {
         GS_STOPPED,
@@ -48,8 +55,23 @@ public:
 
     GameBoard* m_board;
 
+    QList<Animal*> m_animals;
+    QList<QTimer*> m_activeTimers;
+
 private:
-    Game();
+
+
+
+    int m_level;
+    int m_successCounter;
+
+
+
+private slots:
+    void FlipTimeOut();
+    void DoFlip();
+
+
 };
 
 #endif // GAME_H

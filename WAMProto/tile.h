@@ -8,7 +8,8 @@
 //class QStyleOptionGraphicsItem
 //class QWidget
 
-
+class QMediaPlayer;
+class Animal;
 class Tile : public QGraphicsPixmapItem
 {
 public:
@@ -27,6 +28,10 @@ public:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+    void setFacingToTop();
+    void setFacingToBottom();
+
+    void ResetTilesState();
 
     void toFlippedState();
     void toFlippingState();
@@ -34,13 +39,21 @@ public:
     void updateFlippedState(float dt);
     void updateFlippingState(float dt);
 
+    void SetAnimal(Animal* animal);
+
+    void Flip();
+
     enum TileState
     {
         TS_FLIPPED,
         TS_FLIPPING
     } m_state;
 
-
+    enum FaceState
+    {
+        FS_TOP,
+        FS_BOTTOM
+    } m_facing;
 
     void Update(float dt);
 
@@ -49,8 +62,11 @@ public:
     double m_rotation;
     int m_direction;
 
+    Animal* m_animal;
+
     QPixmap* m_pixmap;
     QPixmap* m_lastpixmap;
+    QMediaPlayer* player;
 };
 
 #endif // TILE_H

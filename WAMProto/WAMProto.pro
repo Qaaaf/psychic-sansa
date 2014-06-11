@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui multimedia
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -23,7 +23,9 @@ SOURCES += main.cpp \
     gameboard.cpp \
     tile.cpp \
     configfile.cpp \
-    game.cpp
+    game.cpp \
+    animal.cpp \
+    star.cpp
 
 HEADERS += \
     gamewindow.h \
@@ -31,4 +33,6 @@ HEADERS += \
     gameboard.h \
     tile.h \
     configfile.h \
-    game.h
+    game.h \
+    animal.h \
+    star.h

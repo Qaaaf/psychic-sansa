@@ -11,7 +11,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent)
     boardWidthSpinBox = new QSpinBox;
     boardWidthSpinBox->setRange(1, 8000);
     boardWidthSpinBox->setSpecialValueText(tr("1 (minimum!!)"));
-    boardWidthSpinBox->setValue(8);
+	boardWidthSpinBox->setValue(9);
 
     boardWidthLabel = new QLabel(tr("Board &Width:"));
     boardWidthLabel->setBuddy(boardWidthSpinBox);
@@ -22,7 +22,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) : QWidget(parent)
     boardHeightSpinBox = new QSpinBox;
     boardHeightSpinBox->setRange(1, 8000);
     boardHeightSpinBox->setSpecialValueText(tr("1 (minimum!!)"));
-    boardHeightSpinBox->setValue(8);
+	boardHeightSpinBox->setValue(5);
 
     boardHeightLabel = new QLabel(tr("Board &Height:"));
     boardHeightLabel->setBuddy(boardHeightSpinBox);

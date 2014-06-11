@@ -4,6 +4,9 @@
 #include <QPainterPath>
 
 #include <QtWidgets>
+#include "QAudio"
+#include "QMediaPlayer"
+
 #include "gameboard.h"
 
 #define TILESIZE 64
@@ -15,6 +18,7 @@
 #include <QtDebug>
 
 #include "gamewindow.h"
+#include "animal.h"
 
 QPixmap* p1;
 QPixmap* p2;
@@ -25,109 +29,72 @@ QPixmap* pDefault;
 
 void MapPixmaps()
 {
-    p0 = new QPixmap;
-    p1 = new QPixmap;
-    p2 = new QPixmap;
-    p3 = new QPixmap;
-    p4 = new QPixmap;
-    pDefault = new QPixmap;
-
-    if(!p0->load("../Resources/Icon_0.png"))
-        return;
-
-    p1->load("../Resources/Icon_1.png");
-    p2->load("../Resources/Icon_2.png");
-    p3->load("../Resources/Icon_3.png");
-    p4->load("../Resources/Icon_4.png");
-    pDefault->load("../Resources/Icon_Back.png");
+	pDefault = new QPixmap;
+	pDefault->load("../Resources/Icon_Back.png");
 
 }
 
 QPixmap* getmap()
 {
-    int i = rand()%5;
-    switch (i)
-    {
-    case 0:
-        return p0;
-        break;
-    case 1:
-        return p1;
-        break;
-    case 2:
-        return p2;
-        break;
-    case 3:
-        return p3;
-        break;
-    case 4:
-        return p4;
-        break;
-    default:
-        return pDefault;
-    }
+	return pDefault;
 }
 
 
 bool once = true;
 Tile::Tile()
 {
-    if(once)
-        MapPixmaps();
+	if(once)
+		MapPixmaps();
+	once = false;
 
-    once = false;
+	m_animal = 0;
 
-    m_lastpixmap = pDefault;
-    m_pixmap = getmap();
-    SwitchPixmap();
-    //x = 0;
-    //y = 0;
-    m_rotation = 0.0;
-    m_direction = 1;
+	m_lastpixmap = pDefault;
+	m_pixmap = getmap();
 
-    setFlags(ItemIsSelectable);
-    setAcceptHoverEvents(true);
+	ResetTilesState();
 
-    setTransformOriginPoint(32,32);
+	setFlags(ItemIsSelectable);
+	setAcceptHoverEvents(true);
 
-    m_turnover = false;
+	setTransformOriginPoint(TILESIZE/2,TILESIZE/2);
+
+	player = new QMediaPlayer();
+	player->setMedia(QUrl::fromLocalFile("../Resources/mallard_duck-Mike_Koenig-667013646.wav"));
+	player->setVolume(50);
 }
 
 Tile::~Tile()
 {
 }
 
-void Tile::SwitchPixmap()
+void Tile::SetAnimal(Animal* animal)
 {
-    QPixmap* p = m_pixmap;
-    m_pixmap = m_lastpixmap;
-    m_lastpixmap = p;
-    setPixmap(*m_pixmap);
+	m_animal = animal;
+
+	SwitchPixmap();
 }
 
-//void Tile::setPos(int x, int y)
-//{
-//    this->x = x*TILESIZE+TILEOFFSET;
-//    this->y = y*TILESIZE+TILEOFFSET;
+void Tile::SwitchPixmap()
+{
 
-//    this->setX(x);
-//    this->setY(y);
-//}
+	if(m_facing == FS_TOP)
+		m_pixmap = pDefault;
+	else
+		m_pixmap = m_animal->m_pixmap;
+
+	setPixmap(*m_pixmap);
+}
 
 
 void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget)
 {
-     //Q_UNUSED(widget);
-    //if (item->state & QStyle::State_Selected)
-    //    return;
-
-    QGraphicsPixmapItem::paint(painter, item, widget);
-    //painter->drawPixmap(x,y,this->pixmap());
+	QGraphicsPixmapItem::paint(painter, item, widget);
 }
 
 QRectF Tile::boundingRect() const
 {
-    return QRectF(0, 0, 64, 64);
+	return QRectF(0, 0, 64, 64);
 }
 
 //QPainterPath Tile::shape() const
@@ -138,86 +105,74 @@ QRectF Tile::boundingRect() const
 //    return path;
 //}
 
-
 void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsItem::mousePressEvent(event);
+	QGraphicsItem::mousePressEvent(event);
 
-    qDebug() << "clickevent";
+	qDebug() << "clickevent";
 
-    toFlippingState();
-
-    update();
+	Flip();
 }
 
 void Tile::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    if (event->modifiers() & Qt::ShiftModifier) {
-//        stuff << event->pos();
-//        update();
-//        return;
-//    }
-    QGraphicsItem::mouseMoveEvent(event);
+	//    if (event->modifiers() & Qt::ShiftModifier) {
+	//        stuff << event->pos();
+	//        update();
+	//        return;
+	//    }
+	QGraphicsItem::mouseMoveEvent(event);
 }
 
 void Tile::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsItem::mouseReleaseEvent(event);
-    update();
+	QGraphicsItem::mouseReleaseEvent(event);
+	update();
 }
 
 
 void Tile::Update(float dt)
 {
-    QTransform m;
+	QTransform m;
 
-    switch(m_state)
-    {
-    case TS_FLIPPED:
-    {
-        updateFlippedState(dt);
-        break;
-    }
-    case TS_FLIPPING:
-    {
-        updateFlippingState(dt);
+	switch(m_state)
+	{
+	case TS_FLIPPED:
+	{
+		updateFlippedState(dt);
+		break;
+	}
+	case TS_FLIPPING:
+	{
+		updateFlippingState(dt);
 
-        break;
-    }
-    default:
-        break;
-    }
+		break;
+	}
+	default:
+		break;
+	}
 
-    m.rotate(m_rotation, Qt::XAxis);
-    m.translate(-32,-32);
-    this->setTransform(m);
+	m.rotate(m_rotation, Qt::XAxis);
+	m.translate(-(TILESIZE/2),-(TILESIZE/2));
+	this->setTransform(m);
 }
 
 void Tile::toFlippedState()
 {
-    m_state = TS_FLIPPED;
+	m_state = TS_FLIPPED;
 }
-
-#include "QAudio"
-#include "QMediaPlayer"
 
 void Tile::toFlippingState()
 {
-    if(m_state != TS_FLIPPING)
-    {
-       m_state = TS_FLIPPING;
+	if(m_state != TS_FLIPPING)
+	{
+		m_state = TS_FLIPPING;
 
-       m_turnover = true;
+		m_turnover = true;
 
-       QMediaPlayer* player = new QMediaPlayer();
-       player->setMedia(QUrl::fromLocalFile("../Resources/mallard_duck-Mike_Koenig-667013646.wav"));
-       player->setVolume(50);
-       player->play();
-    }
-    else
-    {
-    }
-
+		if(m_facing == FS_TOP)
+			player->play();
+	}
 }
 
 void Tile::updateFlippedState(float dt)
@@ -226,33 +181,62 @@ void Tile::updateFlippedState(float dt)
 
 void Tile::updateFlippingState(float dt)
 {
-    if(m_rotation > 90.0 || m_rotation < 0.0)
-    {
-        if(m_turnover == true)
-        {
-            SwitchPixmap();
-            m_turnover = false;
-        }
-        else
-            toFlippedState();
-        if(m_rotation > 90)
-            m_rotation = 90.0;
-        else
-            m_rotation = 0.0;
-
-        m_direction = -m_direction;
+	if(m_rotation > 90.0 || m_rotation < 0.0)
+	{
+		if(m_turnover == true)
+		{
+			if(m_facing == FS_TOP)
+				m_facing = FS_BOTTOM;
+			else
+				m_facing = FS_TOP;
 
 
-    }
-    else
-    {
-        m_rotation += 90*dt*15*m_direction;
-    }
+			SwitchPixmap();
+			m_turnover = false;
+		}
+		else
+			toFlippedState();
+		if(m_rotation > 90)
+			m_rotation = 90.0;
+		else
+			m_rotation = 0.0;
 
-    //QTransform m;// =;// this->transform();
-    //m.rotate(rotation, Qt::XAxis);
-    //m.rotate(rotation, Qt::YAxis);
-    //m.translate(-32,-0);
-    //this->setTransform(m);
+		m_direction = -m_direction;
+
+	}
+	else
+	{
+		m_rotation += 90*dt*15*m_direction;
+	}
+}
+
+
+void Tile::ResetTilesState()
+{
+	m_rotation = 0.0;
+	m_direction = 1;
+	m_turnover = false;
+	m_facing = FS_TOP;
+
+	m_state = TS_FLIPPED;
+}
+
+void Tile::setFacingToTop()
+{
+	ResetTilesState();
+	m_facing = FS_TOP;
+}
+
+void Tile::setFacingToBottom()
+{
+	ResetTilesState();
+	m_facing = FS_BOTTOM;
+}
+
+void Tile::Flip()
+{
+	toFlippingState();
+
+	update();
 }
 

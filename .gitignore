@@ -1,0 +1,7 @@
+*.exe
+*.o
+*.png
+*.wav
+*.user
+*.Debug
+*.Release

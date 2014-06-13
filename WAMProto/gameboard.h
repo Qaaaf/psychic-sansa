@@ -8,6 +8,7 @@ class QPixmap;
 class Tile;
 class GameWindow;
 class Star;
+class Animal;
 
 
 class GameBoard
@@ -31,10 +32,21 @@ public:
 
 
 
-    QList<Tile*>& GetOpenTiles();
+	QList<Tile*> GetOpenTiles();
+	QList<Tile*> GetTilesOfType(Animal* animal);
 
 	void SetBoardTop();
 	void SetBoardBottom();
+
+	void FlipBoard();
+
+
+	bool IncreaseStar();
+	bool DecreaseStar();
+	void ResetStars();
+
+
+	void SeedBoard(Animal* seed, int numSeeds);
 
 
 
@@ -43,6 +55,7 @@ public:
     int m_height;
 
     Tile* m_tiles;
+	Tile* m_targetTile;
 
 	Star* m_stars;
 

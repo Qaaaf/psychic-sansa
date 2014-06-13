@@ -58,6 +58,8 @@ public:
     QList<Animal*> m_animals;
     QList<QTimer*> m_activeTimers;
 
+
+
 private:
 
 
@@ -65,11 +67,15 @@ private:
     int m_level;
     int m_successCounter;
 
+	Animal* m_target;
+
 
 
 private slots:
     void FlipTimeOut();
     void DoFlip();
+
+	void StartWAMRound();
 
 
 };

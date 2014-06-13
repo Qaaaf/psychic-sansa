@@ -54,8 +54,8 @@ Tile::Tile()
 
 	ResetTilesState();
 
-	setFlags(ItemIsSelectable);
-	setAcceptHoverEvents(true);
+	//setFlags(ItemIsSelectable);
+	//setAcceptHoverEvents(true);
 
 	setTransformOriginPoint(TILESIZE/2,TILESIZE/2);
 
@@ -225,12 +225,14 @@ void Tile::setFacingToTop()
 {
 	ResetTilesState();
 	m_facing = FS_TOP;
+	SwitchPixmap();
 }
 
 void Tile::setFacingToBottom()
 {
 	ResetTilesState();
 	m_facing = FS_BOTTOM;
+	SwitchPixmap();
 }
 
 void Tile::Flip()

@@ -66,11 +66,7 @@ void Game::playTestAMole()
 {
 	startGame();
 
-	QTimer *timer = new QTimer;
-	QObject::connect(timer, SIGNAL(timeout()), this, SLOT(DoFlip()));
-	timer->start(200);
-
-	m_activeTimers.push_back(timer);
+	QTimer::singleShot(400, this, SLOT(StartWAMRound()));
 }
 
 void Game::startGame()
@@ -109,9 +105,27 @@ void Game::resetGame()
 
 void Game::DoFlip()
 {
-	m_board->GetRandomTile()->Flip();
+	//m_board->GetRandomTile()->Flip();
+
+	m_board->SetBoardTop();
+	m_board->FlipBoard();
 }
 
 void Game::FlipTimeOut()
 {
+}
+
+void Game::StartWAMRound()
+{
+	//set target
+	int rand = qrand() % m_animals.size();
+	m_target = m_animals[rand];
+	m_board->m_targetTile->Flip();
+	m_board->m_targetTile->SetAnimal(m_target);
+
+	m_board->SeedBoard(m_target, 5);
+
+	QTimer::singleShot(1000, this, SLOT(DoFlip()));
+
+	//fli
 }

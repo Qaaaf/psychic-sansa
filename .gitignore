@@ -5,3 +5,16 @@
 *.user
 *.Debug
 *.Release
+build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/Makefile
+build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_gamewindow.cpp
+build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_settingswindow.cpp
+build/Makefile
+build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/Makefile
+build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_gamewindow.cpp
+build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_settingswindow.cpp
+build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Release/Makefile
+build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Release/release/moc_gamewindow.cpp
+build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Release/release/moc_settingswindow.cpp
+build/debug/moc_game.cpp
+build/debug/moc_gamewindow.cpp
+build/debug/moc_settingswindow.cpp

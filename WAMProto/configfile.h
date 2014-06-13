@@ -2,8 +2,8 @@
 #define CONFIGFILE_H
 
 #include <QString>
+#include <QJsonObject>
 
-class QJsonDocument;
 class QJsonArray;
 
 class ConfigFile
@@ -19,14 +19,13 @@ public:
     ~ConfigFile();
 
     void New(QString& name);
-    void Open(QString& name);
-    void Close();
+    void Load(QString& name);
     void Save();
     void SaveAs(QString& name);
 
     QJsonArray& GetArray(QString& name);
 
-    QJsonDocument* m_doc;
+    QJsonObject m_data;
     QString m_name;
 
 

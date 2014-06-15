@@ -2,6 +2,10 @@
 
 #include <QtDebug>
 
+#include <QString>
+
+
+
 
 #include "gamewindow.h"
 #include "settingswindow.h"
@@ -13,24 +17,17 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    ConfigFile::I().Load(QString("test"));
+	ConfigFile::I().Load("test");
 
     QJsonObject& json = ConfigFile::I().m_data;
 
-    QJsonObject playerObject;
-    mPlayer.write(playerObject);
-    json["player"] = playerObject;
+	QJsonObject t;
+	t["testString"] = QString("hello");
+	t["testDouble"] = 0.12;
 
-    QJsonArray levelArray;
-    foreach (const Level level, mLevels) {
-        QJsonObject levelObject;
-        level.write(levelObject);
-        levelArray.append(levelObject);
-    }
-    json["levels"] = levelArray;
+	json["player"] = t;
 
-
-    ConfigFile::I().
+	ConfigFile::I().Save();
 
     GameWindow w;
     w.show();

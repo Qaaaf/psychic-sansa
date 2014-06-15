@@ -17,12 +17,13 @@ ConfigFile::~ConfigFile()
     m_name = "";
 }
 
-void ConfigFile::New(QString& name)
+void ConfigFile::New(const QString& name)
 {
     m_name =  name;
 }
-void ConfigFile::Load(QString& name)
+void ConfigFile::Load(const QString& name)
 {
+	m_name = name;
     QFile f(name + ".wamf");
     f.open(QIODevice::ReadOnly);
 
@@ -39,7 +40,7 @@ void ConfigFile::Save()
 {
     SaveAs(m_name);
 }
-void ConfigFile::SaveAs(QString& name)
+void ConfigFile::SaveAs(const QString& name)
 {
     QFile f(name + ".wamf");
     f.open(QIODevice::WriteOnly);
@@ -49,9 +50,4 @@ void ConfigFile::SaveAs(QString& name)
     f.write(doc.toJson());
 
     f.close();
-}
-
-QJsonArray& ConfigFile::GetArray(QString& name)
-{
-    return m_data[name].toArray();
 }

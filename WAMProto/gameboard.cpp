@@ -44,10 +44,6 @@ GameBoard::~GameBoard()
 {
 }
 
-void GameBoard::OnTileClicked(Tile* tile)
-{
-
-}
 
 void GameBoard::SetBoardXY(int x, int y)
 {
@@ -95,7 +91,7 @@ void GameBoard::CreateBoard()
     for(int y = 0; y < m_height; y++)
         for(int x = 0; x < m_width; x++)
         {
-            int i = y * m_width + x;
+			int i = y * m_width + x;
 			m_tiles[i].setPos(x*TILESIZE+TILEOFFSET*x + BOARDOFFSET, y*TILESIZE+TILEOFFSET*y + TILESIZE/2);
 
 			scene->addItem(&m_tiles[i]);
@@ -240,6 +236,7 @@ void GameBoard::ResetBoard()
 	 }
  }
 
+ //returns false if all stars are full, indicating a level up event;
  bool GameBoard::IncreaseStar()
  {
 	 for(int i = 0; i < NUMSTARS; i++)

@@ -20,6 +20,8 @@
 #include "gamewindow.h"
 #include "animal.h"
 
+#include "Game.h"
+
 QPixmap* p1;
 QPixmap* p2;
 QPixmap* p3;
@@ -111,7 +113,9 @@ void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 	qDebug() << "clickevent";
 
-	Flip();
+	Game::I().OnTileClicked(this);
+
+	//Flip();
 }
 
 void Tile::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -170,8 +174,8 @@ void Tile::toFlippingState()
 
 		m_turnover = true;
 
-		if(m_facing == FS_TOP)
-			player->play();
+		if(m_facing == FS_TOP);
+			//player->play();
 	}
 }
 

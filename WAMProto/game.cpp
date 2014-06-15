@@ -111,8 +111,59 @@ void Game::DoFlip()
 	m_board->FlipBoard();
 }
 
-void Game::FlipTimeOut()
+void Game::RollingFlipTimeOut()
 {
+	switch (m_flipMode)
+	{
+	case FM_INSTANT:
+		m_flipInterval = 0;
+		m_board->FlipBoard();
+		m_flipCount = m_board->m_width*m_board->m_height;
+		break;
+	case FM_ROWS:
+		m_flipInterval = 70;
+		for(int i = m_flipCount; i < m_flipCount+m_board->m_width; i++)
+			m_board->m_tiles[i].Flip();
+
+		m_flipCount += m_board->m_width;
+		break;
+	case FM_COLUMNS:
+		m_flipInterval = 70;
+		for(int i = 0; i < m_board->m_height; i++)
+			m_board->m_tiles[i*m_board->m_width + m_flipCount].Flip();
+
+		m_flipCount ++;
+		if(m_flipCount >= m_board->m_width)
+			m_flipCount = m_board->m_width * m_board->m_height;
+		break;
+	case FM_ROWSSINGLE:
+		m_flipInterval = 15;
+		m_board->m_tiles[m_flipCount].Flip();
+		m_flipCount ++;
+		break;
+	case FM_COLUMNSSINGLE:
+		m_flipInterval = 15;
+		m_board->m_tiles[m_flipColumnCount*m_board->m_width + m_flipCount].Flip();
+
+		m_flipColumnCount++;
+		if(m_flipColumnCount >= m_board->m_height)
+		{
+			m_flipColumnCount = 0;
+			m_flipCount++;
+			if(m_flipCount >= m_board->m_width)
+				m_flipCount = m_board->m_width * m_board->m_height;
+		}
+
+		break;
+	case FM_ROWSCOLUMNSSINGLE:
+
+		break;
+	default:
+		break;
+	}
+
+	if(m_flipCount < (m_board->m_width*m_board->m_height))
+		QTimer::singleShot(m_flipInterval, this, SLOT(RollingFlipTimeOut()));
 }
 
 void Game::StartWAMRound()
@@ -125,7 +176,45 @@ void Game::StartWAMRound()
 
 	m_board->SeedBoard(m_target, 5);
 
-	QTimer::singleShot(1000, this, SLOT(DoFlip()));
+	FlipBoard(FM_COLUMNSSINGLE);
 
 	//fli
+}
+
+void Game::FlipBoard(FLIPMODE m)
+{
+	m_board->SetBoardTop();
+	m_flipMode = m;
+	m_flipCount = 0;
+	m_flipColumnCount = 0;
+	m_flipColumnRowsOffsetCount = 0;
+
+	RollingFlipTimeOut();
+}
+
+void Game::OnTileClicked(Tile* tile)
+{
+	if(tile->m_animal == m_target)
+	{
+		if(!m_board->IncreaseStar())
+		{
+			//play a victory sound
+			m_board->ResetStars();
+			m_level++;
+			StartWAMRound();
+		}
+	}
+	else
+	{
+		if(!m_board->DecreaseStar())
+		{
+			if(m_level)
+				m_level--;
+
+			//else gameover?
+			StartWAMRound();
+		}
+	}
+
+	tile->Flip();
 }

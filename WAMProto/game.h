@@ -15,6 +15,7 @@ enum GameType
 
 class Animal;
 class QTimer;
+class Tile;
 class Game : public QObject
 {
     Q_OBJECT
@@ -58,6 +59,8 @@ public:
     QList<Animal*> m_animals;
     QList<QTimer*> m_activeTimers;
 
+	void OnTileClicked(Tile* tile);
+
 
 
 private:
@@ -69,10 +72,27 @@ private:
 
 	Animal* m_target;
 
+	enum FLIPMODE
+	{
+		FM_INSTANT,
+		FM_ROWS,
+		FM_COLUMNS,
+		FM_ROWSSINGLE,
+		FM_COLUMNSSINGLE,
+		FM_ROWSCOLUMNSSINGLE
+	};
+
+	void FlipBoard(FLIPMODE m);
+	FLIPMODE m_flipMode;
+	int m_flipCount;
+	int m_flipColumnCount;
+	int m_flipColumnRowsOffsetCount;
+	int m_flipInterval;
+
 
 
 private slots:
-    void FlipTimeOut();
+	void RollingFlipTimeOut();
     void DoFlip();
 
 	void StartWAMRound();

@@ -18,12 +18,10 @@ public:
 
     ~ConfigFile();
 
-    void New(QString& name);
-    void Load(QString& name);
+	void New(const QString& name);
+	void Load(const QString& name);
     void Save();
-    void SaveAs(QString& name);
-
-    QJsonArray& GetArray(QString& name);
+	void SaveAs(const QString& name);
 
     QJsonObject m_data;
     QString m_name;

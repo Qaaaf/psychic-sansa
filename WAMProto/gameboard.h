@@ -26,7 +26,7 @@ public:
 
     void Update(float dt);
 
-    void OnTileClicked(Tile* tile);
+	//void OnTileClicked(Tile* tile);
 
 	Tile* GetRandomTile();
 

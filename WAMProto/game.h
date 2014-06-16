@@ -82,12 +82,14 @@ private:
 		FM_ROWSCOLUMNSSINGLE
 	};
 
-	void FlipBoard(FLIPMODE m);
+    void FlipBoard(FLIPMODE m, bool top = true);
 	FLIPMODE m_flipMode;
 	int m_flipCount;
 	int m_flipColumnCount;
 	int m_flipColumnRowsOffsetCount;
 	int m_flipInterval;
+
+    void EnsureSuccesPossible();
 
 
 

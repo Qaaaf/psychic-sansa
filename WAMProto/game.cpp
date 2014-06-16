@@ -181,15 +181,29 @@ void Game::StartWAMRound()
 	//fli
 }
 
-void Game::FlipBoard(FLIPMODE m)
+void Game::FlipBoard(FLIPMODE m, bool top)
 {
-	m_board->SetBoardTop();
+    if(top)
+        m_board->SetBoardTop();
+    else
+        m_board->SetBoardBottom();
+
 	m_flipMode = m;
 	m_flipCount = 0;
 	m_flipColumnCount = 0;
 	m_flipColumnRowsOffsetCount = 0;
 
 	RollingFlipTimeOut();
+}
+
+void Game::EnsureSuccesPossible()
+{
+    for(int i = 0; i < m_board->m_width*m_board->m_height; i++)
+        if(m_board->m_tiles[i].m_animal == m_target)
+            return;
+//full flip implement!
+
+    m_board->SeedBoard(m_target, 5);
 }
 
 void Game::OnTileClicked(Tile* tile)
@@ -201,8 +215,13 @@ void Game::OnTileClicked(Tile* tile)
 			//play a victory sound
 			m_board->ResetStars();
 			m_level++;
-			StartWAMRound();
+
+
+            m_board->m_targetTile->Flip(); //flip to back
+            QTimer::singleShot(400, this, SLOT(StartWAMRound()));
 		}
+        else
+            EnsureSuccesPossible();
 	}
 	else
 	{
@@ -212,8 +231,12 @@ void Game::OnTileClicked(Tile* tile)
 				m_level--;
 
 			//else gameover?
-			StartWAMRound();
+            // play dramatic sound
+            m_board->m_targetTile->Flip(); //flip to back
+            QTimer::singleShot(400, this, SLOT(StartWAMRound()));
 		}
+        else
+            EnsureSuccesPossible();
 	}
 
 	tile->Flip();

@@ -43,6 +43,8 @@ public:
 
     void resetGame();
 
+	void SetBoardGeometry(int x, int y);
+
 
     enum GameState
     {
@@ -55,6 +57,9 @@ public:
     GameType m_gameType;
 
     GameBoard* m_board;
+
+	int m_scrWidth;
+	int m_scrHeight;
 
     QList<Animal*> m_animals;
     QList<QTimer*> m_activeTimers;

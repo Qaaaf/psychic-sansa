@@ -1,5 +1,7 @@
 #include <QApplication>
 
+#include <QDesktopWidget>
+
 #include <QtDebug>
 
 #include <QString>
@@ -9,6 +11,7 @@
 
 #include "gamewindow.h"
 #include "settingswindow.h"
+#include "game.h"
 
 #include "configfile.h"
 
@@ -16,6 +19,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+	Q_INIT_RESOURCE(resourcesWAM);
 
 	ConfigFile::I().Load("test");
 
@@ -32,8 +37,18 @@ int main(int argc, char *argv[])
     GameWindow w;
     w.show();
 
-    SettingsWindow s(0);
-    s.show();
+	QRect r = a.desktop()->screenGeometry();
+	QRect r2 = a.desktop()->availableGeometry();
+
+	//Game::I().SetBoardGeometry(r.x(), r.y()); //flip because xy are in portrait mode and we need landscape
+	Game::I().SetBoardGeometry(1024, 600);
+	Game::I().m_board->SetBoardTileXandY(9,5);
+	Game::I().m_board->CalculateBoardLayout();
+
+	Game::I().playTestAMole();
+
+	//SettingsWindow s(0);
+	//s.show();
 
 
     qDebug() << "Game Started.";

@@ -8,7 +8,7 @@
 build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/Makefile
 build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_gamewindow.cpp
 build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_settingswindow.cpp
-build/Makefile
+build*
 build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/Makefile
 build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_gamewindow.cpp
 build/build-WAMProto-Desktop_Qt_5_2_1_MinGW_32bit-Debug/debug/moc_settingswindow.cpp

@@ -40,6 +40,7 @@ public:
     void updateFlippingState(float dt);
 
     void SetAnimal(Animal* animal);
+	void SetTargetTilePixmap(Animal* animal);
 
     void Flip();
 
@@ -58,6 +59,7 @@ public:
     void Update(float dt);
 
     bool m_turnover;
+	bool m_targetTile;
 
     double m_rotation;
     int m_direction;

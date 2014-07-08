@@ -36,3 +36,11 @@ HEADERS += \
     game.h \
     animal.h \
     star.h
+
+RESOURCES += \
+    resourcesWAM.qrc
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+OTHER_FILES += \
+    android/AndroidManifest.xml

@@ -16,6 +16,8 @@ public:
 
 	void SetState(bool state);
 
+	void SetSize(int x, int y);
+
 
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);

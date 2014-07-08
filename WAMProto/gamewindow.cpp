@@ -31,6 +31,9 @@ GameWindow::GameWindow(QWidget *parent) :
 
     graphicsView->setScene(Game::I().m_board->scene);
 
+	graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     QMatrix matrix;
     matrix.reset();
 

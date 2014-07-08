@@ -9,9 +9,6 @@
 
 #include "gameboard.h"
 
-#define TILESIZE 64
-#define TILEOFFSET 8
-
 #include <QPixmap>
 #include <QGraphicsScene>
 
@@ -22,18 +19,12 @@
 
 #include "Game.h"
 
-QPixmap* p1;
-QPixmap* p2;
-QPixmap* p3;
-QPixmap* p4;
-QPixmap* p0;
 QPixmap* pDefault;
 
 void MapPixmaps()
 {
 	pDefault = new QPixmap;
-	pDefault->load("../Resources/Icon_Back.png");
-
+	pDefault->load(":/Resources/Icon_Back.png");
 }
 
 QPixmap* getmap()
@@ -50,24 +41,27 @@ Tile::Tile()
 	once = false;
 
 	m_animal = 0;
+	m_targetTile = false;
 
 	m_lastpixmap = pDefault;
 	m_pixmap = getmap();
 
 	ResetTilesState();
 
-	//setFlags(ItemIsSelectable);
-	//setAcceptHoverEvents(true);
-
-	setTransformOriginPoint(TILESIZE/2,TILESIZE/2);
-
-	player = new QMediaPlayer();
-	player->setMedia(QUrl::fromLocalFile("../Resources/mallard_duck-Mike_Koenig-667013646.wav"));
-	player->setVolume(50);
+	setTransformOriginPoint(Game::I().m_board->m_tileSizeX/2,Game::I().m_board->m_tileSizeY/2);
 }
 
 Tile::~Tile()
 {
+}
+
+void Tile::SetTargetTilePixmap(Animal* animal)
+{
+	m_animal = animal;
+
+	m_targetTile = true;
+
+	setTransformOriginPoint(Game::I().m_board->m_starSizeX/2,Game::I().m_board->m_starSizeY/2);
 }
 
 void Tile::SetAnimal(Animal* animal)
@@ -82,8 +76,10 @@ void Tile::SwitchPixmap()
 
 	if(m_facing == FS_TOP)
 		m_pixmap = pDefault;
+	else if(!m_targetTile)
+		m_pixmap = m_animal->m_scaledPixmap;
 	else
-		m_pixmap = m_animal->m_pixmap;
+		m_pixmap = m_animal->m_targetPixmap;
 
 	setPixmap(*m_pixmap);
 }
@@ -96,16 +92,11 @@ void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidge
 
 QRectF Tile::boundingRect() const
 {
-	return QRectF(0, 0, 64, 64);
-}
+	if(m_targetTile)
+		return QRectF(0, 0, Game::I().m_board->m_starSizeX, Game::I().m_board->m_starSizeY);
 
-//QPainterPath Tile::shape() const
-//{
-//    QGraphicsItem::shape()
-//    QPainterPath path;
-//    //path.addRect(14, 14, 82, 42);
-//    return path;
-//}
+	return QRectF(0, 0, Game::I().m_board->m_tileSizeX, Game::I().m_board->m_tileSizeY);
+}
 
 void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -114,17 +105,10 @@ void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	qDebug() << "clickevent";
 
 	Game::I().OnTileClicked(this);
-
-	//Flip();
 }
 
 void Tile::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-	//    if (event->modifiers() & Qt::ShiftModifier) {
-	//        stuff << event->pos();
-	//        update();
-	//        return;
-	//    }
 	QGraphicsItem::mouseMoveEvent(event);
 }
 
@@ -157,7 +141,11 @@ void Tile::Update(float dt)
 	}
 
 	m.rotate(m_rotation, Qt::XAxis);
-	m.translate(-(TILESIZE/2),-(TILESIZE/2));
+
+	if(m_targetTile)
+		m.translate(-(Game::I().m_board->m_starSizeX/2),-(Game::I().m_board->m_starSizeY/2));
+	else
+		m.translate(-(Game::I().m_board->m_tileSizeX/2),-(Game::I().m_board->m_tileSizeY/2));
 	this->setTransform(m);
 }
 
@@ -200,6 +188,7 @@ void Tile::updateFlippingState(float dt)
 		}
 		else
 			toFlippedState();
+
 		if(m_rotation > 90)
 			m_rotation = 90.0;
 		else
@@ -245,4 +234,3 @@ void Tile::Flip()
 
 	update();
 }
-

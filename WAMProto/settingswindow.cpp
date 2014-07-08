@@ -53,7 +53,7 @@ void SettingsWindow::boardChanged()
     int height = boardHeightSpinBox->value();
 
     //tell gameboard
-    Game::I().m_board->SetBoardXY(width, height);
+	Game::I().m_board->SetBoardTileXandY(width, height);
 }
 
 SettingsWindow::~SettingsWindow()

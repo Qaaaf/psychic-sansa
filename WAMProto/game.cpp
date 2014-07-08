@@ -20,7 +20,7 @@ Game::Game()
 	m_board = new GameBoard();
 	m_gameState = GS_STOPPED;
 
-	playTestAMole();
+	//playTestAMole();
 
 	//resetGame();
 }
@@ -29,6 +29,14 @@ Game& Game::I()
 {
 	static Game g;
 	return g;
+}
+
+void Game::SetBoardGeometry(int x, int y)
+{
+	m_scrWidth = x;
+	m_scrHeight = y;
+
+	m_board->SetBoardGeometry(x, y);
 }
 
 
@@ -64,6 +72,8 @@ void Game::playWhackAMole()
 
 void Game::playTestAMole()
 {
+	//m_board->SetBoardXY(9, 5);
+
 	startGame();
 
 	QTimer::singleShot(400, this, SLOT(StartWAMRound()));
@@ -98,6 +108,7 @@ void Game::updateStoppingState(float dt)
 
 void Game::resetGame()
 {
+	m_level = 0;
 	m_board->ResetBoard();
 
 	m_gameState = GS_STOPPED;
@@ -118,40 +129,40 @@ void Game::RollingFlipTimeOut()
 	case FM_INSTANT:
 		m_flipInterval = 0;
 		m_board->FlipBoard();
-		m_flipCount = m_board->m_width*m_board->m_height;
+		m_flipCount = m_board->GetTileCount();
 		break;
 	case FM_ROWS:
 		m_flipInterval = 70;
-		for(int i = m_flipCount; i < m_flipCount+m_board->m_width; i++)
-			m_board->m_tiles[i].Flip();
+		for(int i = m_flipCount; i < m_flipCount+m_board->m_tileCountX; i++)
+			m_board->m_tiles[i]->Flip();
 
-		m_flipCount += m_board->m_width;
+		m_flipCount += m_board->m_tileCountX;
 		break;
 	case FM_COLUMNS:
 		m_flipInterval = 70;
-		for(int i = 0; i < m_board->m_height; i++)
-			m_board->m_tiles[i*m_board->m_width + m_flipCount].Flip();
+		for(int i = 0; i < m_board->m_tileCountY; i++)
+			m_board->m_tiles[i*m_board->m_tileCountX + m_flipCount]->Flip();
 
 		m_flipCount ++;
-		if(m_flipCount >= m_board->m_width)
-			m_flipCount = m_board->m_width * m_board->m_height;
+		if(m_flipCount >= m_board->m_tileCountX)
+			m_flipCount = m_board->GetTileCount();
 		break;
 	case FM_ROWSSINGLE:
 		m_flipInterval = 15;
-		m_board->m_tiles[m_flipCount].Flip();
+		m_board->m_tiles[m_flipCount]->Flip();
 		m_flipCount ++;
 		break;
 	case FM_COLUMNSSINGLE:
 		m_flipInterval = 15;
-		m_board->m_tiles[m_flipColumnCount*m_board->m_width + m_flipCount].Flip();
+		m_board->m_tiles[m_flipColumnCount*m_board->m_tileCountX + m_flipCount]->Flip();
 
 		m_flipColumnCount++;
-		if(m_flipColumnCount >= m_board->m_height)
+		if(m_flipColumnCount >= m_board->m_tileCountY)
 		{
 			m_flipColumnCount = 0;
 			m_flipCount++;
-			if(m_flipCount >= m_board->m_width)
-				m_flipCount = m_board->m_width * m_board->m_height;
+			if(m_flipCount >= m_board->m_tileCountX)
+				m_flipCount = m_board->GetTileCount();
 		}
 
 		break;
@@ -162,7 +173,7 @@ void Game::RollingFlipTimeOut()
 		break;
 	}
 
-	if(m_flipCount < (m_board->m_width*m_board->m_height))
+	if(m_flipCount < m_board->GetTileCount())
 		QTimer::singleShot(m_flipInterval, this, SLOT(RollingFlipTimeOut()));
 }
 
@@ -172,7 +183,7 @@ void Game::StartWAMRound()
 	int rand = qrand() % m_animals.size();
 	m_target = m_animals[rand];
 	m_board->m_targetTile->Flip();
-	m_board->m_targetTile->SetAnimal(m_target);
+	m_board->m_targetTile->SetTargetTilePixmap(m_target);
 
 	m_board->SeedBoard(m_target, 5);
 
@@ -198,8 +209,8 @@ void Game::FlipBoard(FLIPMODE m, bool top)
 
 void Game::EnsureSuccesPossible()
 {
-    for(int i = 0; i < m_board->m_width*m_board->m_height; i++)
-        if(m_board->m_tiles[i].m_animal == m_target)
+	for(int i = 0; i < m_board->GetTileCount(); i++)
+		if(m_board->m_tiles[i]->m_animal == m_target)
             return;
 //full flip implement!
 
@@ -218,6 +229,9 @@ void Game::OnTileClicked(Tile* tile)
 
 
             m_board->m_targetTile->Flip(); //flip to back
+
+			m_board->SetBoardTileXandY(m_level+2, m_level+2);
+			m_board->CalculateBoardLayout();
             QTimer::singleShot(400, this, SLOT(StartWAMRound()));
 		}
         else

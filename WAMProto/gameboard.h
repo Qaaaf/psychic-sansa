@@ -17,7 +17,10 @@ public:
     GameBoard();
     ~GameBoard();
 
-    void SetBoardXY(int x, int y);
+
+	void SetBoardGeometry(int x, int y);
+	void SetBoardTileXandY(int x, int y);
+	void CalculateBoardLayout();
 
     void CreateBoard();
     void ResetBoard();
@@ -51,13 +54,35 @@ public:
 
 
 public:
-    int m_width;
-    int m_height;
 
-    Tile* m_tiles;
+	int GetTileCount(){return m_tileCountX*m_tileCountY;}
+
+	int m_scrWidth;
+	int m_scrHeight;
+
+	float m_ratio;
+
+	int m_tileSizeX;
+	int m_tileSizeY;
+
+	int m_tileOffsetX;
+	int m_tileOffsetY;
+
+	int m_tileAreaOffset;
+
+	int m_starOffsetX;
+	int m_starOffsetY;
+
+	int m_starSizeX;
+	int m_starSizeY;
+
+	int m_tileCountX;
+	int m_tileCountY;
+
+	Tile** m_tiles;
 	Tile* m_targetTile;
 
-	Star* m_stars;
+	Star** m_stars;
 
     QPixmap* pixmap;
 

@@ -10,15 +10,10 @@
 
 #include "gamewindow.h"
 
+#include "animal.h"
+
 #define NUMSTARS 3
-
-#define SCREENSIZEX 1024
-#define SCREENSIZEY 600
-
-#define TILESIZE 64
-#define TILEOFFSET 8
-#define BOARDOFFSET (SCREENSIZEX / 5)
-
+#define SCOREFIELDSIZE 0.15
 
 
 GameBoard::GameBoard()
@@ -26,8 +21,11 @@ GameBoard::GameBoard()
     pixmap = new QPixmap;
     pixmap->load("../Resources/Icon_Back.png");
 
-    m_width = 0;
-    m_height = 0;
+	m_tileCountX = 0;
+	m_tileCountY = 0;
+
+	m_scrWidth = 0;
+	m_scrHeight = 0;
 
     m_tiles = 0;
 	m_targetTile = 0;
@@ -35,9 +33,22 @@ GameBoard::GameBoard()
     window = 0;
 
     scene = new QGraphicsScene(0);
-	scene->setSceneRect(0,0, SCREENSIZEX,SCREENSIZEY);
+	scene->setSceneRect(0,0, 0,0);
 
 
+	m_tileSizeX = 0;
+	m_tileSizeY = 0;
+
+	m_tileOffsetX = 0;
+	m_tileOffsetY = 0;
+
+	m_tileAreaOffset = 0;
+
+	m_starOffsetX = 0;
+	m_starOffsetY = 0;
+
+	m_starSizeX = 0;
+	m_starSizeY = 0;
 }
 
 GameBoard::~GameBoard()
@@ -45,57 +56,112 @@ GameBoard::~GameBoard()
 }
 
 
-void GameBoard::SetBoardXY(int x, int y)
+void GameBoard::SetBoardTileXandY(int x, int y)
 {
-    m_width = x;
-    m_height = y;
-
-    CreateBoard();
+	m_tileCountX = x;
+	m_tileCountY = y;
 }
 
+static int gcd (int a, int b)
+{
+	return (b == 0) ? a : gcd (b, a%b);
+}
 
+void GameBoard::SetBoardGeometry(int x, int y)
+{
+	scene->setSceneRect(0, 0, x, y);
+
+	m_scrWidth = x;
+	m_scrHeight = y;
+}
+
+void GameBoard::CalculateBoardLayout()
+{
+	int scoreFieldX = m_scrWidth*SCOREFIELDSIZE;
+	int scoreFieldY = m_scrHeight;
+
+	int playFieldX = m_scrWidth - scoreFieldX;
+	int playFieldY = m_scrHeight;
+
+
+	int tileSizeX = playFieldX / (m_tileCountX+1);
+	int tileSizeY = playFieldY / (m_tileCountY+1);
+
+	m_tileSizeY = m_tileSizeX = (tileSizeX < tileSizeY)? tileSizeX : tileSizeY;
+
+	m_tileOffsetX = (playFieldX - (m_tileSizeX*m_tileCountX)) / (m_tileCountX+1);
+	m_tileOffsetY = (playFieldY - (m_tileSizeY*m_tileCountY)) / (m_tileCountY+1);
+
+	int starSizeX = scoreFieldX*0.9;
+	while(starSizeX*5 > m_scrHeight)
+		starSizeX--;
+
+	m_starSizeX = starSizeX;
+	m_starSizeY = starSizeX;
+
+	m_starOffsetX = (scoreFieldX - starSizeX) /2;
+	m_starOffsetY = (scoreFieldY - (m_starSizeY*4) ) /5;
+
+	m_tileAreaOffset = scoreFieldX;
+
+
+	m_ratio = m_scrWidth/m_scrHeight;
+
+	CreateBoard();
+}
 
 void GameBoard::CreateBoard()
 {
-    if(m_width < 1 || m_height < 1)
+	if(m_tileCountX < 1 || m_tileCountY < 1)
         return;
+
 
     if(m_tiles)
     {
-        scene->clear();
-        //delete[] m_tiles;
-        m_tiles=0;
+		scene->clear();
+		m_tiles = 0;
+		m_stars = 0;
     }
 
-	if(m_targetTile)
-		delete m_targetTile;
+	//if(m_targetTile)
+	//	delete m_targetTile;
+
+	for(int i = 0; i<5; i++)
+	{
+		Game::I().m_animals[i]->SetTargetSize(m_starSizeX);
+		Game::I().m_animals[i]->SetSize(m_tileSizeX, m_tileSizeY);
+	}
 
 	m_targetTile = new Tile();
 	m_targetTile->setAcceptedMouseButtons(false);
-	m_targetTile->setPos(80, 520);
+	m_targetTile->setPos(m_starOffsetX + m_starSizeX/2, m_starSizeY*3+m_starOffsetY*4 + m_starSizeY/2);
 	scene->addItem(m_targetTile);
 
-    m_tiles = new Tile[m_width*m_height];
+	m_tiles = new Tile*[GetTileCount()];
 
-    RandomizeBoard();
-
-	m_stars = new Star[NUMSTARS];
+	m_stars = new Star*[NUMSTARS];
 	for(int i = 0; i < NUMSTARS; i++)
 	{
-		m_stars[i].setPos(20, 30 + 140*i);
-		scene->addItem(&m_stars[i]);
+		m_stars[i] = new Star();
+		m_stars[i]->setPos(m_starOffsetX, + m_starOffsetY + m_starSizeY*i+m_starOffsetY*i);
+		m_stars[i]->SetSize(m_starSizeX, m_starSizeY);
+		scene->addItem(m_stars[i]);
 	}
 
 	ResetStars();
 
-    for(int y = 0; y < m_height; y++)
-        for(int x = 0; x < m_width; x++)
+	for(int y = 0; y < m_tileCountY; y++)
+		for(int x = 0; x < m_tileCountX; x++)
         {
-			int i = y * m_width + x;
-			m_tiles[i].setPos(x*TILESIZE+TILEOFFSET*x + BOARDOFFSET, y*TILESIZE+TILEOFFSET*y + TILESIZE/2);
+			int i = y * m_tileCountX + x;
+			m_tiles[i] = new Tile();
+			m_tiles[i]->setPos(x*m_tileSizeX+m_tileOffsetX*x + m_tileAreaOffset + m_tileOffsetX + m_tileSizeX/2,
+							  y*m_tileSizeY+m_tileOffsetY*y + m_tileSizeY/2 + m_tileOffsetY);
 
-			scene->addItem(&m_tiles[i]);
+			scene->addItem(m_tiles[i]);
         }
+
+	RandomizeBoard();
 
     scene->update();
     if(window)
@@ -104,11 +170,9 @@ void GameBoard::CreateBoard()
 
 void GameBoard::Update(float dt)
 {
-   // qDebug() << "tick.";
-
-    for(int i = 0; i < m_width * m_height; i++)
+	for(int i = 0; i < GetTileCount(); i++)
     {
-		m_tiles[i].Update(dt);
+		m_tiles[i]->Update(dt);
     }
 
 	m_targetTile->Update(dt);
@@ -118,9 +182,9 @@ void GameBoard::ResetBoard()
 {
     if(m_tiles)
     {
-        for(int i = 0; i < m_width*m_height; i++)
+		for(int i = 0; i < GetTileCount(); i++)
         {
-            m_tiles[i].setFacingToTop();
+			m_tiles[i]->setFacingToTop();
         }
     }
 }
@@ -128,10 +192,10 @@ void GameBoard::ResetBoard()
  void GameBoard::RandomizeBoard()
  {
      if(m_tiles)
-         for(int i = 0; i < m_width*m_height; i++)
+		 for(int i = 0; i < GetTileCount(); i++)
          {
              int rand = qrand() % (Game::I().m_animals.size());
-             m_tiles[i].SetAnimal(Game::I().m_animals[rand]);
+			 m_tiles[i]->SetAnimal(Game::I().m_animals[rand]);
          }
 
 	if(m_targetTile)
@@ -146,10 +210,10 @@ void GameBoard::ResetBoard()
      QList<Tile*> list;
 
      if(m_tiles)
-         for(int i = 0; i < m_width*m_height; i++)
+		 for(int i = 0; i < GetTileCount(); i++)
          {
-             if(m_tiles[i].m_facing == Tile::FS_BOTTOM)
-                 list.push_back(&m_tiles[i]);
+			 if(m_tiles[i]->m_facing == Tile::FS_BOTTOM)
+				 list.push_back(m_tiles[i]);
          }
 
 	 return list;
@@ -160,10 +224,10 @@ void GameBoard::ResetBoard()
 	 QList<Tile*> list;
 
 	 if(m_tiles)
-		 for(int i = 0; i < m_width*m_height; i++)
+		 for(int i = 0; i < GetTileCount(); i++)
 		 {
-			 if(m_tiles[i].m_animal == animal)
-				 list.push_back(&m_tiles[i]);
+			 if(m_tiles[i]->m_animal == animal)
+				 list.push_back(m_tiles[i]);
 		 }
 
 	 return list;
@@ -171,7 +235,7 @@ void GameBoard::ResetBoard()
 
  Tile* GameBoard::GetRandomTile()
  {
-	 return &m_tiles[qrand() % (m_width*m_height)];
+	 return m_tiles[qrand() % (GetTileCount())];
  }
 
 
@@ -184,9 +248,9 @@ void GameBoard::ResetBoard()
  {
 	 if(m_tiles)
 	 {
-		 for(int i = 0; i < m_width*m_height; i++)
+		 for(int i = 0; i < GetTileCount(); i++)
 		 {
-			 m_tiles[i].setFacingToBottom();
+			 m_tiles[i]->setFacingToBottom();
 		 }
 	 }
  }
@@ -195,9 +259,9 @@ void GameBoard::ResetBoard()
  {
 	 if(m_tiles)
 	 {
-		 for(int i = 0; i < m_width*m_height; i++)
+		 for(int i = 0; i < GetTileCount(); i++)
 		 {
-			 m_tiles[i].Flip();
+			 m_tiles[i]->Flip();
 		 }
 	 }
  }
@@ -218,20 +282,20 @@ void GameBoard::ResetBoard()
 	 int size = tempanimals.size();
 	 if(m_tiles)
 	 {
-		 for(int i = 0; i < m_width*m_height; i++)
+		 for(int i = 0; i < GetTileCount(); i++)
 		 {
 			 int rand = qrand() % size;
-			 m_tiles[i].SetAnimal(tempanimals[rand]);
+			 m_tiles[i]->SetAnimal(tempanimals[rand]);
 		 }
 
-		int r = qrand() % m_width*m_height;
+		int r = qrand() % GetTileCount();
 
 		for(int i = 0; i< numSeeds; i++)
 		{
-			while(m_tiles[r].m_animal == seed)
-				r = qrand() % m_width*m_height;
+			while(m_tiles[r]->m_animal == seed)
+				r = qrand() % GetTileCount();
 
-			m_tiles[r].SetAnimal(seed);
+			m_tiles[r]->SetAnimal(seed);
 		}
 	 }
  }
@@ -241,9 +305,9 @@ void GameBoard::ResetBoard()
  {
 	 for(int i = 0; i < NUMSTARS; i++)
 	 {
-		 if(!m_stars[i].m_state)
+		 if(!m_stars[i]->m_state)
 		 {
-			 m_stars[i].SetState(true);
+			 m_stars[i]->SetState(true);
 			 return true;
 		 }
 	 }
@@ -255,9 +319,9 @@ void GameBoard::ResetBoard()
  {
 	 for(int i = NUMSTARS-1; i >= 0; i--)
 	 {
-		 if(m_stars[i].m_state)
+		 if(m_stars[i]->m_state)
 		 {
-			 m_stars[i].SetState(false);
+			 m_stars[i]->SetState(false);
 			 return true;
 		 }
 	 }
@@ -269,6 +333,6 @@ void GameBoard::ResetBoard()
  {
 	 for(int i = 0; i < NUMSTARS; i++)
 	 {
-		 m_stars[i].SetState(false);
+		 m_stars[i]->SetState(false);
 	 }
  }

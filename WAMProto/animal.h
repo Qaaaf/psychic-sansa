@@ -22,7 +22,7 @@ public:
     QString m_name;
 
 
-	void SetSize(int x, int y);
+    void SetSize(int x);
 	void SetTargetSize(int x);
 };
 

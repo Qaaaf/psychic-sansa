@@ -20,7 +20,7 @@ Animal::Animal(const QString& name)
 }
 
 
-void Animal::SetSize(int x, int y)
+void Animal::SetSize(int x)
 {
 	if(m_scaledPixmap && m_scaledPixmap->size().width() == x)
 		return;

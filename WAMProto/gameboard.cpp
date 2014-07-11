@@ -129,7 +129,7 @@ void GameBoard::CreateBoard()
 	for(int i = 0; i<5; i++)
 	{
 		Game::I().m_animals[i]->SetTargetSize(m_starSizeX);
-		Game::I().m_animals[i]->SetSize(m_tileSizeX, m_tileSizeY);
+        Game::I().m_animals[i]->SetSize(m_tileSizeX);
 	}
 
 	m_targetTile = new Tile();
@@ -144,7 +144,7 @@ void GameBoard::CreateBoard()
 	{
 		m_stars[i] = new Star();
 		m_stars[i]->setPos(m_starOffsetX, + m_starOffsetY + m_starSizeY*i+m_starOffsetY*i);
-		m_stars[i]->SetSize(m_starSizeX, m_starSizeY);
+        m_stars[i]->SetSize(m_starSizeX);
 		scene->addItem(m_stars[i]);
 	}
 

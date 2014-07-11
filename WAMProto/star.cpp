@@ -26,7 +26,7 @@ Star::~Star()
 	//m_fullStar = 0;
 }
 
-void Star::SetSize(int x, int y)
+void Star::SetSize(int x)
 {
 	if(m_fullStar && m_fullStar->size().width() == x)
 		return;

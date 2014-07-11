@@ -19,6 +19,9 @@ Game::Game()
 
 	m_board = new GameBoard();
 	m_gameState = GS_STOPPED;
+    m_roundState = RS_READY;
+    m_screenState = SS_GAMESCREEN;
+    m_flipMode = FM_DONE;
 
 	//playTestAMole();
 
@@ -42,25 +45,34 @@ void Game::SetBoardGeometry(int x, int y)
 
 void Game::Update(float dt)
 {
-	m_board->Update(dt);
+    switch(m_screenState)
+    {
+    case SS_GAMESCREEN:
+        switch (m_gameState)
+        {
+        case GS_STOPPED:
+            break;
+        case GS_RUNNING:
+            UpdateGameRunning(dt);
 
-	switch (m_gameState)
-	{
-	case GS_STOPPED:
-		break;
-	case GS_STOPPING:
-		break;
-	case GS_STARTING:
-		break;
-	case GS_RUNNING:
-		break;
-	default:
-		break;
-	}
+            break;
+        default:
+            break;
+        }
+        break;
+    case SS_MAINMENU:
+        break;
+    case SS_OPTIONS:
+        break;
+    default:
+        break;
+
+    }
 }
 
-void Game::Render()
+void Game::UpdateGameRunning(float dt)
 {
+    m_board->Update(dt);
 }
 
 void Game::playWhackAMole()
@@ -76,7 +88,7 @@ void Game::playTestAMole()
 
 	startGame();
 
-	QTimer::singleShot(400, this, SLOT(StartWAMRound()));
+    QTimer::singleShot(400, this, SLOT(StartRound()));
 }
 
 void Game::startGame()
@@ -84,26 +96,12 @@ void Game::startGame()
 	m_level = 0;
 	m_successCounter = 0;
 
-	m_gameState = GS_STARTING;
+    m_gameState = GS_RUNNING;
 }
 
 void Game::stopGame()
 {
-	m_gameState = GS_STOPPING;
-}
-
-void Game::updateWhackAMole(float dt)
-{
-}
-void Game::updateTestAMole(float dt)
-{
-
-}
-
-void Game::updateStoppingState(float dt)
-{
-	resetGame();
-
+    m_gameState = GS_STOPPED;
 }
 
 void Game::resetGame()
@@ -175,9 +173,11 @@ void Game::RollingFlipTimeOut()
 
 	if(m_flipCount < m_board->GetTileCount())
 		QTimer::singleShot(m_flipInterval, this, SLOT(RollingFlipTimeOut()));
+    else
+        m_flipMode = FM_DONE;
 }
 
-void Game::StartWAMRound()
+void Game::StartRound()
 {
 	//set target
 	int rand = qrand() % m_animals.size();
@@ -232,7 +232,7 @@ void Game::OnTileClicked(Tile* tile)
 
 			m_board->SetBoardTileXandY(m_level+2, m_level+2);
 			m_board->CalculateBoardLayout();
-            QTimer::singleShot(400, this, SLOT(StartWAMRound()));
+            QTimer::singleShot(400, this, SLOT(StartRound()));
 		}
         else
             EnsureSuccesPossible();
@@ -247,7 +247,7 @@ void Game::OnTileClicked(Tile* tile)
 			//else gameover?
             // play dramatic sound
             m_board->m_targetTile->Flip(); //flip to back
-            QTimer::singleShot(400, this, SLOT(StartWAMRound()));
+            QTimer::singleShot(400, this, SLOT(StartRound()));
 		}
         else
             EnsureSuccesPossible();

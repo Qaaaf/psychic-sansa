@@ -21,25 +21,19 @@ class Game : public QObject
     Q_OBJECT
 
 public:
+
     Game();
 
     static Game& I();
 
     void Update(float dt);
-
-    void Render();
-
+    void UpdateGameRunning(float dt);
 
     void playWhackAMole();
     void playTestAMole();
 
     void startGame();
     void stopGame();
-
-    void updateWhackAMole(float dt);
-    void updateTestAMole(float dt);
-
-    void updateStoppingState(float dt);
 
     void resetGame();
 
@@ -49,10 +43,22 @@ public:
     enum GameState
     {
         GS_STOPPED,
-        GS_STOPPING,
         GS_RUNNING,
-        GS_STARTING,
     } m_gameState;
+
+    enum ScreenState
+    {
+        SS_MAINMENU,
+        SS_GAMESCREEN,
+        SS_OPTIONS,
+    } m_screenState;
+
+    enum RoundState
+    {
+        RS_PLAYING,
+        RS_UPDATINGBOARD,
+        RS_READY,
+    } m_roundState;
 
     GameType m_gameType;
 
@@ -70,8 +76,6 @@ public:
 
 private:
 
-
-
     int m_level;
     int m_successCounter;
 
@@ -79,6 +83,7 @@ private:
 
 	enum FLIPMODE
 	{
+        FM_DONE,
 		FM_INSTANT,
 		FM_ROWS,
 		FM_COLUMNS,
@@ -102,7 +107,7 @@ private slots:
 	void RollingFlipTimeOut();
     void DoFlip();
 
-	void StartWAMRound();
+    void StartRound();
 
 
 };

@@ -16,7 +16,7 @@ public:
 
 	void SetState(bool state);
 
-	void SetSize(int x, int y);
+    void SetSize(int x);
 
 
 	QRectF boundingRect() const;

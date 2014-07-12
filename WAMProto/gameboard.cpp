@@ -55,6 +55,11 @@ GameBoard::~GameBoard()
 {
 }
 
+void GameBoard::SetupBoard(int tileCountX, int tileCountY)
+{
+	SetBoardTileXandY(tileCountX, tileCountY);
+	CalculateBoardLayout();
+}
 
 void GameBoard::SetBoardTileXandY(int x, int y)
 {
@@ -123,10 +128,7 @@ void GameBoard::CreateBoard()
 		m_stars = 0;
     }
 
-	//if(m_targetTile)
-	//	delete m_targetTile;
-
-	for(int i = 0; i<5; i++)
+	for(int i = 0; i<Game::I().m_animals.size(); i++)
 	{
 		Game::I().m_animals[i]->SetTargetSize(m_starSizeX);
         Game::I().m_animals[i]->SetSize(m_tileSizeX);
@@ -147,6 +149,8 @@ void GameBoard::CreateBoard()
         m_stars[i]->SetSize(m_starSizeX);
 		scene->addItem(m_stars[i]);
 	}
+
+	Game::I().ScaleDefault(m_tileSizeX, m_starSizeX);
 
 	ResetStars();
 
@@ -173,9 +177,10 @@ void GameBoard::Update(float dt)
 	for(int i = 0; i < GetTileCount(); i++)
     {
 		m_tiles[i]->Update(dt);
-    }
+	}
 
-	m_targetTile->Update(dt);
+	if(m_targetTile)
+		m_targetTile->Update(dt);
 }
 
 void GameBoard::ResetBoard()
@@ -266,51 +271,97 @@ void GameBoard::ResetBoard()
 	 }
  }
 
- void GameBoard::SeedBoard(Animal *seed, int numSeeds)
+ void GameBoard::FlipBoardFaceDown()
  {
-	 QList<Animal*> tempanimals = Game::I().m_animals;
-
-	 for(int i = 0; i < tempanimals.size();i++)
-	 {
-		 if(seed == tempanimals[i])
-		 {
-			 tempanimals.removeAt(i);
-			 continue;
-		 }
-	 }
-
-	 int size = tempanimals.size();
 	 if(m_tiles)
 	 {
 		 for(int i = 0; i < GetTileCount(); i++)
 		 {
-			 int rand = qrand() % size;
-			 m_tiles[i]->SetAnimal(tempanimals[rand]);
+			 m_tiles[i]->FlipFaceDown();
 		 }
+	 }
+ }
+
+void GameBoard::FlipBoardFaceUp()
+{
+	if(m_tiles)
+	{
+		for(int i = 0; i < GetTileCount(); i++)
+		{
+			m_tiles[i]->FlipFaceUp();
+		}
+	}
+}
+
+bool GameBoard::GetBoardStable()
+{
+	if(m_tiles)
+	{
+		for(int i = 0; i < GetTileCount(); i++)
+		{
+			if(m_tiles[i]->m_state != Tile::TS_FLIPPED)
+				return false;
+		}
+	}
+	return true;
+}
+
+
+#include <QTime>
+void GameBoard::SeedBoard(Animal *seed)
+{
+	qsrand(QTime::currentTime().msec());
+
+	QList<Animal*> tempanimals = Game::I().m_animals;
+
+	int seeds = GetTileCount()/10;
+	if(seeds < 1)
+		seeds = 1;
+
+	for(int i = 0; i < tempanimals.size();i++)
+	{
+		if(seed == tempanimals[i])
+		{
+			tempanimals.removeAt(i);
+			continue;
+		}
+	}
+
+	int size = tempanimals.size();
+	if(m_tiles)
+	{
+		for(int i = 0; i < GetTileCount(); i++)
+		{
+			int rand = qrand() % size;
+			m_tiles[i]->SetAnimal(tempanimals[rand]);
+		}
 
 		int r = qrand() % GetTileCount();
 
-		for(int i = 0; i< numSeeds; i++)
+
+		for(int i = 0; i< seeds; i++)
 		{
 			while(m_tiles[r]->m_animal == seed)
 				r = qrand() % GetTileCount();
 
 			m_tiles[r]->SetAnimal(seed);
 		}
-	 }
- }
+	}
+}
 
  //returns false if all stars are full, indicating a level up event;
  bool GameBoard::IncreaseStar()
  {
 	 for(int i = 0; i < NUMSTARS; i++)
-	 {
 		 if(!m_stars[i]->m_state)
 		 {
 			 m_stars[i]->SetState(true);
-			 return true;
+			 break;
 		 }
-	 }
+
+	 for(int i = 0; i < NUMSTARS; i++)
+		 if(!m_stars[i]->m_state)
+			 return true;
 
 	 return false;
  }

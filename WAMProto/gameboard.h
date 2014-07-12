@@ -18,9 +18,9 @@ public:
     ~GameBoard();
 
 
+	void SetupBoard(int tileCountX, int tileCountY);
 	void SetBoardGeometry(int x, int y);
-	void SetBoardTileXandY(int x, int y);
-	void CalculateBoardLayout();
+
 
     void CreateBoard();
     void ResetBoard();
@@ -33,7 +33,7 @@ public:
 
 	Tile* GetRandomTile();
 
-
+	bool GetBoardStable();
 
 	QList<Tile*> GetOpenTiles();
 	QList<Tile*> GetTilesOfType(Animal* animal);
@@ -42,6 +42,8 @@ public:
 	void SetBoardBottom();
 
 	void FlipBoard();
+	void FlipBoardFaceDown();
+	void FlipBoardFaceUp();
 
 
 	bool IncreaseStar();
@@ -49,7 +51,7 @@ public:
 	void ResetStars();
 
 
-	void SeedBoard(Animal* seed, int numSeeds);
+	void SeedBoard(Animal* seed);
 
 
 
@@ -89,6 +91,10 @@ public:
     GameWindow* window;
 
     QGraphicsScene *scene;
+
+private:
+	void SetBoardTileXandY(int x, int y);
+	void CalculateBoardLayout();
 };
 
 #endif // GAMEBOARD_H

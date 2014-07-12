@@ -16,6 +16,7 @@ enum GameType
 class Animal;
 class QTimer;
 class Tile;
+class QPixmap;
 class Game : public QObject
 {
     Q_OBJECT
@@ -29,7 +30,6 @@ public:
     void Update(float dt);
     void UpdateGameRunning(float dt);
 
-    void playWhackAMole();
     void playTestAMole();
 
     void startGame();
@@ -38,6 +38,14 @@ public:
     void resetGame();
 
 	void SetBoardGeometry(int x, int y);
+
+	QPixmap* GetDefault();
+	QPixmap* GetTargetDefault();
+	void ScaleDefault(int x, int x2);
+
+
+	int GetFlipSpeed();
+	int m_flipSpeed;
 
 
     enum GameState
@@ -56,7 +64,9 @@ public:
     enum RoundState
     {
         RS_PLAYING,
-        RS_UPDATINGBOARD,
+		RS_UPDATINGBOARDFORREADY,
+		RS_UPDATINGBOARDFORPLAYING,
+		RS_UPDATINGBOARDFORCONTINUE,
         RS_READY,
     } m_roundState;
 
@@ -68,11 +78,11 @@ public:
 	int m_scrHeight;
 
     QList<Animal*> m_animals;
-    QList<QTimer*> m_activeTimers;
+
+	QTimer* m_roundTimer;
 
 	void OnTileClicked(Tile* tile);
-
-
+	void OnTileFlipped(Tile* tile);
 
 private:
 
@@ -92,12 +102,13 @@ private:
 		FM_ROWSCOLUMNSSINGLE
 	};
 
-    void FlipBoard(FLIPMODE m, bool top = true);
+	void FlipBoard(FLIPMODE m, bool faceUp = true);
 	FLIPMODE m_flipMode;
 	int m_flipCount;
 	int m_flipColumnCount;
 	int m_flipColumnRowsOffsetCount;
 	int m_flipInterval;
+	bool m_flipTarget;
 
     void EnsureSuccesPossible();
 
@@ -108,6 +119,8 @@ private slots:
     void DoFlip();
 
     void StartRound();
+
+	void RoundTimeOut();
 
 
 };

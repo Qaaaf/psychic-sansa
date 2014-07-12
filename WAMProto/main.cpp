@@ -37,15 +37,15 @@ int main(int argc, char *argv[])
     GameWindow w;
     w.show();
 
-	QRect r = a.desktop()->screenGeometry();
-	QRect r2 = a.desktop()->availableGeometry();
+	//QRect r = a.desktop()->screenGeometry();
+	//QRect r2 = a.desktop()->availableGeometry();
 
 	//Game::I().SetBoardGeometry(r.x(), r.y()); //flip because xy are in portrait mode and we need landscape
 	Game::I().SetBoardGeometry(1024, 600);
-	Game::I().m_board->SetBoardTileXandY(9,5);
-	Game::I().m_board->CalculateBoardLayout();
+	//Game::I().m_board->SetBoardTileXandY(9,5);
+	//Game::I().m_board->CalculateBoardLayout();
 
-	Game::I().playTestAMole();
+	Game::I().startGame();
 
 	//SettingsWindow s(0);
 	//s.show();

@@ -42,19 +42,28 @@ public:
     void SetAnimal(Animal* animal);
 	void SetTargetTilePixmap(Animal* animal);
 
+
+	enum TileState
+	{
+		TS_FLIPPED,
+		TS_FLIPPING
+	} m_state;
+
+	enum FaceState
+	{
+		FS_TOP,
+		FS_BOTTOM
+	} m_facing;
+
+
     void Flip();
+	void FlipFaceUp();
+	void FlipFaceDown();
+	void FlipToFace(FaceState state);
 
-    enum TileState
-    {
-        TS_FLIPPED,
-        TS_FLIPPING
-    } m_state;
+	bool FaceUp();
 
-    enum FaceState
-    {
-        FS_TOP,
-        FS_BOTTOM
-    } m_facing;
+	FaceState m_targetFacing;
 
     void Update(float dt);
 

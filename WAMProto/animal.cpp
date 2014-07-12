@@ -13,7 +13,12 @@ Animal::Animal(const QString& name)
     QString soundfile = file + ".wav";
     m_sound->setSource(QUrl::fromLocalFile(soundfile));
 
-    if(m_pixmap->load(file + ".png") && m_sound->isLoaded())
+	if(!m_pixmap->load(file + ".png"))
+	{
+		file = "..\\Resources\\" + name;
+		m_pixmap->load(file + ".png");
+	}
+	if(m_sound->isLoaded())
     {
         m_loaded = true;
     }

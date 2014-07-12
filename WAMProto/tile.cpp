@@ -19,32 +19,13 @@
 
 #include "Game.h"
 
-QPixmap* pDefault;
-
-void MapPixmaps()
-{
-	pDefault = new QPixmap;
-	pDefault->load(":/Resources/Icon_Back.png");
-}
-
-QPixmap* getmap()
-{
-	return pDefault;
-}
-
-
-bool once = true;
 Tile::Tile()
 {
-	if(once)
-		MapPixmaps();
-	once = false;
-
 	m_animal = 0;
 	m_targetTile = false;
 
-	m_lastpixmap = pDefault;
-	m_pixmap = getmap();
+	m_lastpixmap = 0;//Game::I().GetDefault();
+	m_pixmap = 0;//Game::I().GetDefault();
 
 	ResetTilesState();
 
@@ -75,7 +56,10 @@ void Tile::SwitchPixmap()
 {
 
 	if(m_facing == FS_TOP)
-		m_pixmap = pDefault;
+		if(m_targetTile)
+			m_pixmap = Game::I().GetTargetDefault();
+		else
+			m_pixmap = Game::I().GetDefault();
 	else if(!m_targetTile)
 		m_pixmap = m_animal->m_scaledPixmap;
 	else
@@ -104,7 +88,8 @@ void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 	qDebug() << "clickevent";
 
-	Game::I().OnTileClicked(this);
+	if(m_state == TS_FLIPPED)
+		Game::I().OnTileClicked(this);
 }
 
 void Tile::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -152,6 +137,7 @@ void Tile::Update(float dt)
 void Tile::toFlippedState()
 {
 	m_state = TS_FLIPPED;
+	Game::I().OnTileFlipped(this);
 }
 
 void Tile::toFlippingState()
@@ -161,9 +147,6 @@ void Tile::toFlippingState()
 		m_state = TS_FLIPPING;
 
 		m_turnover = true;
-
-		if(m_facing == FS_TOP);
-			//player->play();
 	}
 }
 
@@ -177,11 +160,7 @@ void Tile::updateFlippingState(float dt)
 	{
 		if(m_turnover == true)
 		{
-			if(m_facing == FS_TOP)
-				m_facing = FS_BOTTOM;
-			else
-				m_facing = FS_TOP;
-
+			m_facing = m_targetFacing;
 
 			SwitchPixmap();
 			m_turnover = false;
@@ -199,7 +178,7 @@ void Tile::updateFlippingState(float dt)
 	}
 	else
 	{
-		m_rotation += 90*dt*15*m_direction;
+		m_rotation += dt*m_direction*Game::I().GetFlipSpeed();
 	}
 }
 
@@ -228,9 +207,49 @@ void Tile::setFacingToBottom()
 	SwitchPixmap();
 }
 
+bool Tile::FaceUp() //return true if not rotating, picture up
+{
+	if (m_state == TS_FLIPPED && m_facing == FS_BOTTOM)
+		return true;
+	else
+		return false;
+}
+
 void Tile::Flip()
 {
+	if(m_facing == FS_TOP)
+		m_targetFacing = FS_BOTTOM;
+	else
+		m_targetFacing = FS_TOP;
+
 	toFlippingState();
 
 	update();
+}
+
+void Tile::FlipToFace(Tile::FaceState state)
+{
+	m_targetFacing = state;
+
+	if(m_state == TS_FLIPPING)
+	{
+		m_turnover = false;
+	}
+
+	if(m_facing != m_targetFacing)
+	{
+		toFlippingState();
+
+		update();
+	}
+}
+
+void Tile::FlipFaceUp()
+{
+	FlipToFace(FS_BOTTOM);
+}
+
+void Tile::FlipFaceDown()
+{
+	FlipToFace(FS_TOP);
 }

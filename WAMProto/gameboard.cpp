@@ -2,6 +2,7 @@
 #include "gameboard.h"
 #include "tile.h"
 #include "star.h"
+#include "timebar.h"
 
 #include <QPixmap>
 #include <QGraphicsScene>
@@ -49,6 +50,8 @@ GameBoard::GameBoard()
 
 	m_starSizeX = 0;
 	m_starSizeY = 0;
+
+    m_timeBar = 0;
 }
 
 GameBoard::~GameBoard()
@@ -85,17 +88,17 @@ void GameBoard::CalculateBoardLayout()
 	int scoreFieldX = m_scrWidth*SCOREFIELDSIZE;
 	int scoreFieldY = m_scrHeight;
 
-	int playFieldX = m_scrWidth - scoreFieldX;
-	int playFieldY = m_scrHeight;
+    m_playFieldX = m_scrWidth - scoreFieldX;
+    m_playFieldY = m_scrHeight;
 
 
-	int tileSizeX = playFieldX / (m_tileCountX+1);
-	int tileSizeY = playFieldY / (m_tileCountY+1);
+    int tileSizeX = m_playFieldX / (m_tileCountX+1);
+    int tileSizeY = m_playFieldY / (m_tileCountY+1);
 
 	m_tileSizeY = m_tileSizeX = (tileSizeX < tileSizeY)? tileSizeX : tileSizeY;
 
-	m_tileOffsetX = (playFieldX - (m_tileSizeX*m_tileCountX)) / (m_tileCountX+1);
-	m_tileOffsetY = (playFieldY - (m_tileSizeY*m_tileCountY)) / (m_tileCountY+1);
+    m_tileOffsetX = (m_playFieldX - (m_tileSizeX*m_tileCountX)) / (m_tileCountX+1);
+    m_tileOffsetY = (m_playFieldY - (m_tileSizeY*m_tileCountY)) / (m_tileCountY+1);
 
 	int starSizeX = scoreFieldX*0.9;
 	while(starSizeX*5 > m_scrHeight)
@@ -126,6 +129,9 @@ void GameBoard::CreateBoard()
 		scene->clear();
 		m_tiles = 0;
 		m_stars = 0;
+
+        m_timeBar = 0;
+        m_targetTile = 0;
     }
 
 	for(int i = 0; i<Game::I().m_animals.size(); i++)
@@ -138,6 +144,11 @@ void GameBoard::CreateBoard()
 	m_targetTile->setAcceptedMouseButtons(false);
 	m_targetTile->setPos(m_starOffsetX + m_starSizeX/2, m_starSizeY*3+m_starOffsetY*4 + m_starSizeY/2);
 	scene->addItem(m_targetTile);
+
+    m_timeBar = new TimeBar();
+    m_timeBar->SetSize(m_playFieldX, 10);
+    m_timeBar->setPos(m_scrWidth*SCOREFIELDSIZE, 0.0);
+    scene->addItem(m_timeBar);
 
 	m_tiles = new Tile*[GetTileCount()];
 

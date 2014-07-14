@@ -114,9 +114,13 @@ void Game::Update(float dt)
     }
 }
 
+#include <QGraphicsScene>
+#include "timebar.h"
 void Game::UpdateGameRunning(float dt)
 {
     m_board->Update(dt);
+    if( m_board->m_timeBar)
+    m_board->m_timeBar->SetFilledPercentage((float)(m_roundTimer->remainingTime())/10000.0);
 
 	switch(m_roundState)
 	{
@@ -154,6 +158,8 @@ void Game::UpdateGameRunning(float dt)
 	default:
 		break;
 	}
+
+    m_board->scene->update();
 }
 
 void Game::startGame()

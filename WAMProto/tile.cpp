@@ -100,7 +100,7 @@ void Tile::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void Tile::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 	QGraphicsItem::mouseReleaseEvent(event);
-	update();
+    //update();
 }
 
 
@@ -224,7 +224,7 @@ void Tile::Flip()
 
 	toFlippingState();
 
-	update();
+    //update();
 }
 
 void Tile::FlipToFace(Tile::FaceState state)
@@ -240,7 +240,7 @@ void Tile::FlipToFace(Tile::FaceState state)
 	{
 		toFlippingState();
 
-		update();
+        //update();
 	}
 }
 

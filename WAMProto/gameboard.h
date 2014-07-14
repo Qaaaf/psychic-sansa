@@ -9,6 +9,7 @@ class Tile;
 class GameWindow;
 class Star;
 class Animal;
+class TimeBar;
 
 
 class GameBoard
@@ -62,6 +63,9 @@ public:
 	int m_scrWidth;
 	int m_scrHeight;
 
+    int m_playFieldX;
+    int m_playFieldY;
+
 	float m_ratio;
 
 	int m_tileSizeX;
@@ -85,6 +89,8 @@ public:
 	Tile* m_targetTile;
 
 	Star** m_stars;
+
+    TimeBar* m_timeBar;
 
     QPixmap* pixmap;
 

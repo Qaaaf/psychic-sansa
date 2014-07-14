@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     configfile.cpp \
     game.cpp \
     animal.cpp \
-    star.cpp
+    star.cpp \
+    timebar.cpp
 
 HEADERS += \
     gamewindow.h \
@@ -35,7 +36,8 @@ HEADERS += \
     configfile.h \
     game.h \
     animal.h \
-    star.h
+    star.h \
+    timebar.h
 
 RESOURCES += \
     resourcesWAM.qrc

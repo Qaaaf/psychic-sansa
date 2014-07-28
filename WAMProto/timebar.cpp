@@ -17,7 +17,7 @@ void TimeBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWi
     QColor fillColor = Qt::red;
 
     painter->fillRect(QRectF(0, 0, m_filledX, 10), fillColor);
-    qDebug() << "drawing size to " << m_filledX;
+    //qDebug() << "drawing size to " << m_filledX;
 }
 void TimeBar::SetFilledPercentage(float percentage)
 {

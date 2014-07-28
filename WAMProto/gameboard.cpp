@@ -91,6 +91,21 @@ void GameBoard::CalculateBoardLayout()
     m_playFieldX = m_scrWidth - scoreFieldX;
     m_playFieldY = m_scrHeight;
 
+    m_ratio = (float)m_scrWidth/(float)m_scrHeight;
+    qDebug() << m_ratio;
+
+    float tileCount  = (float)(m_tileCountX * m_tileCountY);
+    if(tileCount > 20)
+    {
+        float tx = m_tileCountX * m_ratio;
+        float ty = m_tileCountX * m_ratio;
+
+        m_tileCountX = int(tileCount/m_ratio);
+        m_tileCountY = tileCount - m_tileCountX;
+
+//        qDebug() << "TileCountX = " << m_tileCountX << " TileCountY = " << m_tileCountY;
+    }
+
 
     int tileSizeX = m_playFieldX / (m_tileCountX+1);
     int tileSizeY = m_playFieldY / (m_tileCountY+1);
@@ -111,9 +126,6 @@ void GameBoard::CalculateBoardLayout()
 	m_starOffsetY = (scoreFieldY - (m_starSizeY*4) ) /5;
 
 	m_tileAreaOffset = scoreFieldX;
-
-
-	m_ratio = m_scrWidth/m_scrHeight;
 
 	CreateBoard();
 }
